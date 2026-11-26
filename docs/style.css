@@ -51,7 +51,9 @@
 html {
   scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
-  overflow-x: clip;
+  text-size-adjust: 100%;
+  overflow-x: hidden;
+  max-width: 100%;
 }
 
 body {
@@ -64,7 +66,10 @@ body {
   font-size: 15px;
   line-height: 1.55;
   margin: 0;
-  overflow-x: clip;
+  overflow-x: hidden;
+  max-width: 100%;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
   -webkit-font-smoothing: antialiased;
   transition: background-color 0.2s ease, color 0.2s ease;
 }
@@ -78,8 +83,7 @@ body.drawer-open {
   display: flex;
   min-height: 100vh;
   width: 100%;
-  max-width: 100vw;
-  overflow-x: clip;
+  max-width: 100%;
 }
 
 /* Mobile Backdrop */
@@ -740,8 +744,18 @@ p code, li code, td code {
     font-size: 14px;
   }
 
+  .docs-container {
+    display: block;
+    width: 100%;
+  }
+
   .mobile-bar {
     display: flex;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 58px;
   }
 
   .drawer-close-btn {
@@ -752,6 +766,9 @@ p code, li code, td code {
 
   .sidebar {
     width: min(85vw, 300px);
+    height: 100vh;
+    height: 100dvh;
+    -webkit-overflow-scrolling: touch;
     transform: translateX(-105%);
     padding: 18px 16px;
   }
@@ -762,8 +779,15 @@ p code, li code, td code {
   }
 
   .main-wrapper {
+    display: block;
+    width: 100%;
     margin-left: 0;
-    padding: 20px 14px 56px;
+    padding: 76px 14px 56px;
+  }
+
+  .main-inner {
+    display: block;
+    width: 100%;
   }
 
   .card-panel {
