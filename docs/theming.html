@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <title>Custom Webpages &amp; Themes &mdash; DoesCap Documentation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Port custom HTML webpages, SSR template placeholders, and static assets into DoesCap.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="mobile-bar">
+    <div style="font-family: var(--font-head); font-size: 16px;">DOESCAP DOCS</div>
+    <button class="mobile-menu-btn" aria-label="Toggle navigation menu" onclick="toggleSidebar()">MENU ☰</button>
+  </div>
+
+  <div class="docs-container">
+    <aside id="sidebar" class="sidebar"></aside>
+
+    <main class="main-wrapper">
+      <div class="main-inner">
+        <span class="badge-pill">MODULE 5 / 6 &bull; CUSTOM WEBPAGES &amp; THEMES</span>
+        <h1 class="hero-title">CUSTOM THEMING</h1>
+        <p class="hero-lead">
+          Replace the built-in verification UI with your own custom HTML template, brand styling, fonts, and static assets.
+        </p>
+
+        <section id="custom-html">
+          <div class="card-panel">
+            <h2>PORTING YOUR OWN BRANDED WEBPAGE</h2>
+            <p style="color:var(--ink-soft); font-size:14px; margin-bottom:12px;">
+              Override the built-in UI completely by passing a raw string via <code>custom_html</code> or a file via <code>custom_html_path</code>
+              (<code>custom_html</code> takes precedence if both are set):
+            </p>
+            <pre class="code-box"><button class="copy-button" onclick="copySnippet(this)">COPY</button><code>from doescap import DoesCap, RelayConfig
+
+config = RelayConfig(
+    custom_html_path="./my_branding.html",
+    custom_assets_dir="./my_assets",
+    title="My Custom Portal",
+    theme="dark",
+)
+
+with DoesCap(config=config) as relay:
+    token = relay.solve(sitekey="...")</code></pre>
+
+            <div class="field-label">SSR TEMPLATE PLACEHOLDERS &amp; CLIENT CONTRACT</div>
+            <ul class="notes-ul">
+              <li><strong>Optional SSR Placeholders:</strong> Server automatically replaces <code>{{ title }}</code>, <code>{{ theme }}</code>, <code>{{ sitekey }}</code>, and <code>{{ rqdata }}</code> inside custom HTML before serving.</li>
+              <li><strong>Client Polling:</strong> Fetch <code>GET /status</code> to retrieve live JSON <code>{"sitekey", "rqdata", "mode", "solved", "task_name", "promo_code"}</code>.</li>
+              <li><strong>Token Submission:</strong> When hCaptcha resolves, <code>POST /solve</code> with JSON <code>{"token": token}</code>.</li>
+            </ul>
+          </div>
+        </section>
+
+        <section id="custom-assets">
+          <div class="card-panel">
+            <h2>STATIC ASSET HOSTING (/assets/*)</h2>
+            <p style="color:var(--ink-soft); font-size:14px; margin-bottom:12px;">
+              Point <code>custom_assets_dir</code> to a local folder containing stylesheets, scripts, fonts, or logos, then reference them from your custom HTML as <code>/assets/filename.ext</code>:
+            </p>
+            <pre class="code-box"><button class="copy-button" onclick="copySnippet(this)">COPY</button><code>&lt;link rel="stylesheet" href="/assets/style.css"&gt;
+&lt;img src="/assets/logo.png" alt="Logo"&gt;</code></pre>
+            <p style="color:var(--ink-soft); font-size:13px; margin-top:12px;">
+              All asset requests are verified against <code>os.path.commonpath</code> to prevent directory traversal outside <code>custom_assets_dir</code>.
+            </p>
+          </div>
+        </section>
+
+        <nav class="module-pager" aria-label="Module pagination">
+          <a class="pager-btn prev" href="api.html">
+            <span class="pager-dir">&larr; PREVIOUS MODULE</span>
+            <span class="pager-title">Python API Reference</span>
+          </a>
+          <a class="pager-btn next" href="cli.html">
+            <span class="pager-dir">NEXT MODULE &rarr;</span>
+            <span class="pager-title">CLI &amp; Diagnostics</span>
+          </a>
+        </nav>
+      </div>
+    </main>
+  </div>
+
+  <script src="docs.js"></script>
+  <script>initDocs("theming.html");</script>
+</body>
+</html>

@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <title>REST Endpoints &mdash; DoesCap Documentation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="HTTP REST API endpoints exposed by DoesCap local relay server.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="mobile-bar">
+    <div style="font-family: var(--font-head); font-size: 16px;">DOESCAP DOCS</div>
+    <button class="mobile-menu-btn" aria-label="Toggle navigation menu" onclick="toggleSidebar()">MENU ☰</button>
+  </div>
+
+  <div class="docs-container">
+    <aside id="sidebar" class="sidebar"></aside>
+
+    <main class="main-wrapper">
+      <div class="main-inner">
+        <span class="badge-pill">MODULE 3 / 6 &bull; REST ENDPOINTS</span>
+        <h1 class="hero-title">REST ENDPOINTS</h1>
+        <p class="hero-lead">
+          All HTTP routes served by <code>ReusableThreadingServer</code>. CORS headers (<code>Access-Control-Allow-Origin: *</code>) and <code>OPTIONS</code> preflight are enabled across every route.
+        </p>
+
+        <section id="endpoints">
+          <!-- GET / -->
+          <div id="endpoint-root" class="card-panel">
+            <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap">
+              <span class="method-tag method-get">GET</span>
+              <code class="route-path">/</code>
+            </div>
+            <h3>Serve Relay Frontend</h3>
+            <p style="color:var(--ink-soft); font-size:14px; margin:0 0 4px">
+              Serves either the built-in responsive dark/light solver UI or your custom HTML template (<code>custom_html</code> / <code>custom_html_path</code>).
+            </p>
+            <div class="field-label">EXAMPLE</div>
+            <pre class="code-box"><button class="copy-button" onclick="copySnippet(this)">COPY</button><code>curl "http://127.0.0.1:8787/"</code></pre>
+            <div class="field-label">RESPONSE</div>
+            <p style="color:var(--ink-faint); font-size:13px; margin-top:4px;">Returns <code>200 OK</code> with <code>text/html; charset=utf-8</code>.</p>
+          </div>
+
+          <!-- GET /status -->
+          <div id="endpoint-status" class="card-panel">
+            <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap">
+              <span class="method-tag method-get">GET</span>
+              <code class="route-path">/status</code>
+            </div>
+            <h3>Get solver state &amp; parameters</h3>
+            <p style="color:var(--ink-soft); font-size:14px; margin:0 0 4px">
+              Polled by frontend JavaScript (every <code>300ms</code> in the default UI) to fetch the active mode, sitekey, rqdata, task name, promo code, and completion flags.
+            </p>
+
+            <div class="field-label">EXAMPLE</div>
+            <pre class="code-box"><button class="copy-button" onclick="copySnippet(this)">COPY</button><code>curl "http://127.0.0.1:8787/status"</code></pre>
+
+            <div class="field-label">RESPONSE</div>
+            <pre class="code-box"><button class="copy-button" onclick="copySnippet(this)">COPY</button><code>{
+  "mode": "direct",
+  "sitekey": "4c672d35-0701-42b2-88c3-78380b0db560",
+  "rqdata": "ey...",
+  "task_name": "hCaptcha Verification",
+  "promo_code": "",
+  "solved": false,
+  "claimed": false,
+  "success_message": "",
+  "error": "",
+  "rect": null
+}</code></pre>
+          </div>
+
+          <!-- POST /solve -->
+          <div id="endpoint-solve" class="card-panel">
+            <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap">
+              <span class="method-tag method-post">POST</span>
+              <code class="route-path">/solve</code>
+            </div>
+            <h3>Submit solved captcha token</h3>
+            <p style="color:var(--ink-soft); font-size:14px; margin:0 0 4px">
+              Dispatched by browser JavaScript when hCaptcha's verification callback fires. Stores the trimmed token and marks the challenge solved.
+            </p>
+
+            <div class="field-label">BODY</div>
+            <div class="param-item">
+              <code class="param-chip">token</code> <span class="param-type">string</span> <span class="param-req">required</span>
+              <div class="param-desc">Verified <code>h-captcha-response</code> token string. Missing token returns <code>400</code>.</div>
+            </div>
+            <pre class="code-box"><code>{
+  "token": "P1_eyJhbGciOi..."
+}</code></pre>
+
+            <div class="field-label">EXAMPLE</div>
+            <pre class="code-box"><button class="copy-button" onclick="copySnippet(this)">COPY</button><code>curl -X POST "http://127.0.0.1:8787/solve" \
+  -H "Content-Type: application/json" \
+  -d '{"token":"P1_eyJhbGciOi..."}'</code></pre>
+
+            <div class="field-label">RESPONSE</div>
+            <pre class="code-box"><code>{"ok":true}</code></pre>
+          </div>
+
+          <!-- GET /frame.jpg -->
+          <div id="endpoint-frame" class="card-panel">
+            <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap">
+              <span class="method-tag method-get">GET</span>
+              <code class="route-path">/frame.jpg</code>
+            </div>
+            <h3>Stream screencast mirror frame</h3>
+            <p style="color:var(--ink-soft); font-size:14px; margin:0 0 4px">
+              Used in CDP Screencast mode to stream real-time JPEG captures of the puzzle widget.
+              Returns <code>200 OK</code> (<code>image/jpeg</code>) when a frame is ready, or <code>204 No Content</code> if no frame has been captured yet.
+            </p>
+          </div>
+
+          <!-- POST /input -->
+          <div id="endpoint-input" class="card-panel">
+            <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap">
+              <span class="method-tag method-post">POST</span>
+              <code class="route-path">/input</code>
+            </div>
+            <h3>Forward mouse/touch coordinates</h3>
+            <p style="color:var(--ink-soft); font-size:14px; margin:0 0 4px">
+              Forwards tap and mouse interactions into the headless browser session via CDP, offset by the puzzle iframe's bounding box (<code>rect.x + x</code>, <code>rect.y + y</code>).
+            </p>
+
+            <div class="field-label">PARAMETERS</div>
+            <div class="param-item">
+              <code class="param-chip">t</code> <span class="param-type">string</span> <span class="param-opt">optional (default: "move")</span> &mdash; <code>"press"</code> | <code>"move"</code> | <code>"release"</code>
+            </div>
+            <div class="param-item">
+              <code class="param-chip">x</code> <span class="param-type">number</span> <span class="param-opt">optional (default: 0)</span> &mdash; Relative horizontal X coordinate
+            </div>
+            <div class="param-item">
+              <code class="param-chip">y</code> <span class="param-type">number</span> <span class="param-opt">optional (default: 0)</span> &mdash; Relative vertical Y coordinate
+            </div>
+          </div>
+
+          <!-- GET /assets/* -->
+          <div id="endpoint-assets" class="card-panel">
+            <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap">
+              <span class="method-tag method-get">GET</span>
+              <code class="route-path">/assets/&lt;path&gt;</code>
+            </div>
+            <h3>Serve custom static assets</h3>
+            <p style="color:var(--ink-soft); font-size:14px; margin:0 0 4px">
+              Active when <code>custom_assets_dir</code> is set. Resolves paths safely with <code>os.path.commonpath</code> containment (blocking directory traversal)
+              and serves files with MIME detection (<code>.html</code>, <code>.css</code>, <code>.js</code>, <code>.json</code>, <code>.png</code>, <code>.jpg</code>, <code>.svg</code>, <code>.ico</code>, <code>.ttf</code>, <code>.woff</code>, <code>.woff2</code>, <code>.otf</code>).
+              Returns <code>404 Asset Not Found</code> when missing or disabled.
+            </p>
+          </div>
+        </section>
+
+        <nav class="module-pager" aria-label="Module pagination">
+          <a class="pager-btn prev" href="architecture.html">
+            <span class="pager-dir">&larr; PREVIOUS MODULE</span>
+            <span class="pager-title">Architecture &amp; Modes</span>
+          </a>
+          <a class="pager-btn next" href="api.html">
+            <span class="pager-dir">NEXT MODULE &rarr;</span>
+            <span class="pager-title">Python API Reference</span>
+          </a>
+        </nav>
+      </div>
+    </main>
+  </div>
+
+  <script src="docs.js"></script>
+  <script>initDocs("endpoints.html");</script>
+</body>
+</html>

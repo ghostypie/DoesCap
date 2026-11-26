@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <title>Architecture &amp; Modes &mdash; DoesCap Documentation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="DoesCap solver modes: Direct In-Browser Mode, Headless CDP Screencast Mode, and Android Termux setup.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="mobile-bar">
+    <div style="font-family: var(--font-head); font-size: 16px;">DOESCAP DOCS</div>
+    <button class="mobile-menu-btn" aria-label="Toggle navigation menu" onclick="toggleSidebar()">MENU ☰</button>
+  </div>
+
+  <div class="docs-container">
+    <aside id="sidebar" class="sidebar"></aside>
+
+    <main class="main-wrapper">
+      <div class="main-inner">
+        <span class="badge-pill">MODULE 2 / 6 &bull; ARCHITECTURE &amp; MODES</span>
+        <h1 class="hero-title">ARCHITECTURE &amp; MODES</h1>
+        <p class="hero-lead">
+          Understand how DoesCap switches seamlessly between zero-overhead Direct In-Browser solving, optional Headless CDP Screencast mirroring, and Android Termux intent handlers.
+        </p>
+
+        <section id="direct-mode">
+          <div class="card-panel">
+            <h2>1. DIRECT IN-BROWSER MODE (DEFAULT)</h2>
+            <p style="color:var(--ink-soft); font-size:14px; margin-bottom:10px;">
+              Active whenever <code>browser_path</code> is <code>None</code> (default) or when running on Android/Termux:
+            </p>
+            <ul class="notes-ul">
+              <li><strong>Zero background RAM / CPU:</strong> No hidden headless Chromium process running in Python.</li>
+              <li><strong>Hardware-Accelerated Touch:</strong> Renders <code>js.hcaptcha.com/1/api.js</code> directly in the user's browser at 60Hz&ndash;144Hz.</li>
+              <li><strong>Instant Callback:</strong> Once solved, the browser fires <code>POST /solve</code> and <code>solve()</code> returns within milliseconds.</li>
+            </ul>
+          </div>
+        </section>
+
+        <section id="cdp-mode">
+          <div class="card-panel">
+            <h2>2. HEADLESS CDP SCREENCAST MODE</h2>
+            <p style="color:var(--ink-soft); font-size:14px; margin-bottom:10px;">
+              Activates when <code>browser_path</code> is supplied, <code>websocket-client</code> is installed, and <code>find_browser()</code> locates a desktop Chromium binary (Chrome, Brave, Chromium, Edge, Opera, or Vivaldi):
+            </p>
+            <ul class="notes-ul">
+              <li>Spawns headless Chromium (<code>--headless=new</code>, <code>--remote-debugging-port</code>) with a temporary profile directory.</li>
+              <li>Captures JPEG screenshots (quality <code>82</code>) of the puzzle iframe bounding box every <code>0.20s</code> and serves them via <code>GET /frame.jpg</code>.</li>
+              <li>Forwards mouse/touch <code>move</code>, <code>press</code>, and <code>release</code> events from <code>POST /input</code> into CDP <code>Input.dispatchMouseEvent</code>.</li>
+              <li>Polls page runtime every <code>0.4s</code> for the response token and automatically falls back to Direct Mode if the headless browser fails or CDP times out.</li>
+            </ul>
+          </div>
+        </section>
+
+        <section id="termux">
+          <div class="card-panel">
+            <h2>3. ANDROID &amp; TERMUX SETUP</h2>
+            <p style="color:var(--ink-soft); font-size:14px; margin-bottom:10px;">
+              DoesCap detects Termux/Android automatically via <code>ANDROID_ROOT</code>, <code>TERMUX_VERSION</code>, or <code>PREFIX</code> containing <code>com.termux</code>:
+            </p>
+            <pre class="code-box"><button class="copy-button" onclick="copySnippet(this)">COPY</button><code># 1. Update Termux and install Python
+pkg update &amp;&amp; pkg install python
+
+# 2. Install doescap
+pip install doescap
+
+# 3. Run solver
+python -c 'from doescap import solve_captcha; print(solve_captcha("4c672d35-0701-42b2-88c3-78380b0db560"))'</code></pre>
+            <p style="color:var(--ink-soft); font-size:13px; margin-top:12px;">
+              When <code>auto_open_browser=True</code>, <code>open_browser()</code> cascades through <code>termux-open-url</code>, <code>termux-open</code>,
+              Android Activity Manager Chrome/VIEW intents (<code>am start</code> and <code>/system/bin/am</code>), <code>xdg-open</code>, and Python's <code>webbrowser</code>.
+            </p>
+          </div>
+        </section>
+
+        <nav class="module-pager" aria-label="Module pagination">
+          <a class="pager-btn prev" href="index.html">
+            <span class="pager-dir">&larr; PREVIOUS MODULE</span>
+            <span class="pager-title">Getting Started</span>
+          </a>
+          <a class="pager-btn next" href="endpoints.html">
+            <span class="pager-dir">NEXT MODULE &rarr;</span>
+            <span class="pager-title">REST Endpoints</span>
+          </a>
+        </nav>
+      </div>
+    </main>
+  </div>
+
+  <script src="docs.js"></script>
+  <script>initDocs("architecture.html");</script>
+</body>
+</html>

@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <title>Getting Started &mdash; DoesCap Documentation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Getting started with DoesCap: installation, quickstart examples, and overview.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="mobile-bar">
+    <div style="font-family: var(--font-head); font-size: 16px;">DOESCAP DOCS</div>
+    <button class="mobile-menu-btn" aria-label="Toggle navigation menu" onclick="toggleSidebar()">MENU ☰</button>
+  </div>
+
+  <div class="docs-container">
+    <aside id="sidebar" class="sidebar"></aside>
+
+    <main class="main-wrapper">
+      <div class="main-inner">
+        <section id="overview">
+          <span class="badge-pill">MODULE 1 / 6 &bull; GETTING STARTED</span>
+          <h1 class="hero-title">DOESCAP DOCS</h1>
+          <p class="hero-lead">
+            Build on DoesCap &mdash; created completely by <strong>GhoSty</strong>. Spin up local verification relays, solve hCaptcha challenges natively in any browser at full 60Hz/120Hz touch rates,
+            or mirror headless Chromium sessions &mdash; cross-platform across Windows, macOS, Linux, and Android Termux.
+          </p>
+          <div style="display:flex; flex-wrap:wrap; gap:10px; margin:16px 0 8px;">
+            <a class="badge-pill" style="margin-bottom:0;" href="https://github.com/ghostypie" target="_blank">GitHub &bull; @ghostypie</a>
+            <a class="badge-pill" style="margin-bottom:0;" href="https://discord.com/invite/asMJGgDA7u" target="_blank">Discord Support Server</a>
+            <a class="badge-pill" style="margin-bottom:0;" href="https://donatr.ee/brutality/" target="_blank">Support Developer (Donatree)</a>
+          </div>
+          <div class="base-url-pill">
+            Base Relay URL: <span>http://127.0.0.1:8787</span>
+          </div>
+        </section>
+
+        <section id="quick-start">
+          <div class="card-panel">
+            <h2>QUICK START</h2>
+            <pre class="code-box"><button class="copy-button" onclick="copySnippet(this)">COPY</button><code># 1. Install package
+pip install doescap
+
+# 2. Synchronous solving in 1 line
+from doescap import solve_captcha
+
+token = solve_captcha("4c672d35-0701-42b2-88c3-78380b0db560")
+print(f"Verified Token: {token}")
+
+# 3. Asynchronous solving with asyncio
+import asyncio
+from doescap import async_solve_captcha
+
+async def main():
+    token = await async_solve_captcha("4c672d35-0701-42b2-88c3-78380b0db560")
+    print(f"Async Token: {token}")
+
+asyncio.run(main())</code></pre>
+            <p style="color:var(--ink-faint); font-size:13px; margin:16px 0 0;">
+              DoesCap starts a local <code>ThreadingHTTPServer</code>, automatically opens your device browser, receives the solved token via <code>POST /solve</code>,
+              and returns a string-compatible <code>SolveResult</code> (or <code>None</code> if cancelled/timed out).
+            </p>
+          </div>
+        </section>
+
+        <section id="installation">
+          <h2 class="section-title">INSTALLATION</h2>
+          <div class="card-panel">
+            <h2>STANDARD INSTALLATION</h2>
+            <p style="color:var(--ink-soft); font-size:14px; margin-bottom:12px;">
+              Python 3.8+ required with zero external dependencies for standard Direct In-Browser mode:
+            </p>
+            <pre class="code-box"><button class="copy-button" onclick="copySnippet(this)">COPY</button><code>pip install doescap</code></pre>
+
+            <div class="field-label">HEADLESS SCREENCAST EXTRA (OPTIONAL)</div>
+            <p style="color:var(--ink-soft); font-size:14px; margin-bottom:12px;">
+              Installs <code>websocket-client&gt;=1.6.0</code> required for Chrome DevTools Protocol (CDP) screencast mode:
+            </p>
+            <pre class="code-box"><button class="copy-button" onclick="copySnippet(this)">COPY</button><code>pip install "doescap[screencast]"</code></pre>
+          </div>
+        </section>
+
+        <nav class="module-pager" aria-label="Module pagination">
+          <a class="pager-btn next" href="architecture.html">
+            <span class="pager-dir">NEXT MODULE &rarr;</span>
+            <span class="pager-title">Architecture &amp; Modes</span>
+          </a>
+        </nav>
+      </div>
+    </main>
+  </div>
+
+  <script src="docs.js"></script>
+  <script>initDocs("index.html");</script>
+</body>
+</html>

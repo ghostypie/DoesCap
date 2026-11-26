@@ -1,0 +1,62 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "doescap"
+version = "1.0.0"
+description = "DoesCap: Fast, lightweight cross-platform hCaptcha relay and solver library built by GhoSty, supporting Windows, macOS, Linux, and Android (Termux)."
+readme = "README.md"
+authors = [
+    { name = "GhoSty" }
+]
+license = { text = "MIT" }
+requires-python = ">=3.8"
+keywords = [
+    "doescap",
+    "hcaptcha",
+    "captcha",
+    "relay",
+    "termux",
+    "android",
+    "cdp",
+    "automation",
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Internet :: WWW/HTTP",
+]
+dependencies = []
+
+[project.optional-dependencies]
+screencast = [
+    "websocket-client>=1.6.0"
+]
+
+[project.urls]
+Homepage = "https://github.com/ghostypie/DoesCap"
+Documentation = "https://ghostypie.github.io/DoesCap/"
+Repository = "https://github.com/ghostypie/DoesCap"
+Issues = "https://github.com/ghostypie/DoesCap/issues"
+"Author GitHub" = "https://github.com/ghostypie"
+"Discord Support" = "https://discord.com/invite/asMJGgDA7u"
+"Support / Donate" = "https://donatr.ee/brutality/"
+
+[project.scripts]
+doescap = "doescap.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["doescap*"]

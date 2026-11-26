@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <title>Python API Reference &mdash; DoesCap Documentation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="DoesCap Python API reference: DoesCap, RelayConfig, SolveResult, solve_captcha, and async_solve_captcha.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="mobile-bar">
+    <div style="font-family: var(--font-head); font-size: 16px;">DOESCAP DOCS</div>
+    <button class="mobile-menu-btn" aria-label="Toggle navigation menu" onclick="toggleSidebar()">MENU ☰</button>
+  </div>
+
+  <div class="docs-container">
+    <aside id="sidebar" class="sidebar"></aside>
+
+    <main class="main-wrapper">
+      <div class="main-inner">
+        <span class="badge-pill">MODULE 4 / 6 &bull; PYTHON API REFERENCE</span>
+        <h1 class="hero-title">PYTHON API</h1>
+        <p class="hero-lead">
+          Full reference for all classes, configuration attributes, string-compatible return types, and functional helpers exported by <code>doescap</code>.
+        </p>
+
+        <section id="api-reference">
+          <!-- DoesCap Class -->
+          <div id="api-relay" class="card-panel">
+            <h2>CLASS: DoesCap (alias: HCaptchaRelay)</h2>
+            <p style="color:var(--ink-soft); font-size:14px; margin-bottom:12px;">
+              Primary client managing relay server lifecycles, browser launching, and token capture. Supports context management (<code>with DoesCap(...) as relay:</code>)
+              and exports <code>HCaptchaRelay = DoesCap</code> plus <code>relay.solve_relay = relay.solve</code> for backward compatibility.
+            </p>
+            <pre class="code-box"><button class="copy-button" onclick="copySnippet(this)">COPY</button><code>from doescap import DoesCap, RelayConfig
+
+config = RelayConfig(host="0.0.0.0", port=8787, auto_open_browser=True)
+
+with DoesCap(config=config) as relay:
+    # Active URLs (available after server starts inside solve)
+    print(relay.localhost_url, relay.relay_url)
+
+    # Synchronous solve (returns SolveResult | None)
+    token = relay.solve(
+        sitekey="4c672d35-0701-42b2-88c3-78380b0db560",
+        rqdata=None,
+        task_name="Account Verification",
+        timeout=180,
+    )
+
+    # Asynchronous solve (non-blocking executor wrapper)
+    # token = await relay.async_solve(sitekey="...", rqdata="...", quest_name="...")
+
+    if token:
+        # Update web UI &amp; auto-close server after 25s
+        relay.mark_claimed(task_name="Account Verification", promo_code="PASS-200")
+    else:
+        # Mark error &amp; auto-close server after 10s
+        relay.mark_failed("Timed out or invalid token")</code></pre>
+
+            <div class="field-label">METHODS &amp; PROPERTIES</div>
+            <ul class="notes-ul">
+              <li><code>solve(sitekey, rqdata=None, *, timeout=None, token=None, context_token=None, rqtoken=None, quest_name=None, task_name=None, custom_html=None, custom_html_path=None)</code> &rarr; <code>Optional[SolveResult]</code></li>
+              <li><code>async_solve(...)</code> &rarr; <code>Optional[SolveResult]</code> (same parameters, runs inside <code>loop.run_in_executor</code>).</li>
+              <li><code>solve_relay</code> &rarr; alias to <code>solve</code>.</li>
+              <li><code>mark_completed(message="Verification complete!")</code> &rarr; updates <code>success_message</code> shown on the web success screen.</li>
+              <li><code>mark_claimed(quest_name="", reward_name="", promo_code="", task_name=None)</code> &rarr; updates UI with task name &amp; copyable promo code, then calls <code>close()</code> after 25s.</li>
+              <li><code>mark_failed(error_msg)</code> &rarr; records error message in state and calls <code>close()</code> after 10s.</li>
+              <li><code>close()</code> / <code>cleanup()</code> &rarr; terminates headless browser subprocess/CDP socket and shuts down HTTP server.</li>
+              <li><code>relay_url</code> / <code>localhost_url</code> &rarr; properties returning <code>http://&lt;lan_ip&gt;:&lt;active_port&gt;/</code> and <code>http://127.0.0.1:&lt;active_port&gt;/</code>.</li>
+            </ul>
+          </div>
+
+          <!-- RelayConfig -->
+          <div id="api-config" class="card-panel">
+            <h2>CLASS: RelayConfig</h2>
+            <p style="color:var(--ink-soft); font-size:14px; margin-bottom:12px;">
+              Configuration class governing network bind, port selection, browser mode, custom webpages, and Windows firewall rules.
+              Every field can also be passed directly as a keyword argument to <code>DoesCap(...)</code>:
+            </p>
+            <div class="data-table-scroll">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Option</th>
+                    <th>Type</th>
+                    <th>Default</th>
+                    <th>Purpose</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>host</code></td>
+                    <td>str</td>
+                    <td><code>"0.0.0.0"</code></td>
+                    <td>Bind IP address. <code>"0.0.0.0"</code> allows local &amp; LAN connectivity.</td>
+                  </tr>
+                  <tr>
+                    <td><code>port</code></td>
+                    <td>int</td>
+                    <td><code>8787</code></td>
+                    <td>Preferred TCP port (auto-picks free ephemeral port if busy).</td>
+                  </tr>
+                  <tr>
+                    <td><code>auto_open_browser</code></td>
+                    <td>bool</td>
+                    <td><code>True</code></td>
+                    <td>Launches default browser on desktop or via Android/Termux intents.</td>
+                  </tr>
+                  <tr>
+                    <td><code>browser_path</code></td>
+                    <td>str | None</td>
+                    <td><code>None</code></td>
+                    <td>Binary path or keyword (e.g. <code>"chrome"</code>, <code>"brave"</code>) to enable CDP screencast mode.</td>
+                  </tr>
+                  <tr>
+                    <td><code>timeout</code></td>
+                    <td>int</td>
+                    <td><code>300</code></td>
+                    <td>Maximum wait time in seconds before returning <code>None</code>.</td>
+                  </tr>
+                  <tr>
+                    <td><code>title</code></td>
+                    <td>str</td>
+                    <td><code>"DoesCap Relay"</code></td>
+                    <td>Header and <code>&lt;title&gt;</code> text displayed in the web UI.</td>
+                  </tr>
+                  <tr>
+                    <td><code>theme</code></td>
+                    <td>str</td>
+                    <td><code>"dark"</code></td>
+                    <td>Built-in solver UI &amp; hCaptcha widget theme (<code>"dark"</code> or <code>"light"</code>).</td>
+                  </tr>
+                  <tr>
+                    <td><code>allow_firewall_rule</code></td>
+                    <td>bool</td>
+                    <td><code>True</code></td>
+                    <td>On Windows, attempts <code>netsh advfirewall</code> inbound TCP rule for the active port.</td>
+                  </tr>
+                  <tr>
+                    <td><code>custom_html</code></td>
+                    <td>str | None</td>
+                    <td><code>None</code></td>
+                    <td>Raw custom HTML template string served at <code>/</code>.</td>
+                  </tr>
+                  <tr>
+                    <td><code>custom_html_path</code></td>
+                    <td>str | None</td>
+                    <td><code>None</code></td>
+                    <td>Filepath to a custom <code>.html</code> file served at <code>/</code>.</td>
+                  </tr>
+                  <tr>
+                    <td><code>custom_assets_dir</code></td>
+                    <td>str | None</td>
+                    <td><code>None</code></td>
+                    <td>Directory for static files served safely under <code>/assets/*</code>.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- SolveResult -->
+          <div id="api-result" class="card-panel">
+            <h2>CLASS: SolveResult (STR SUBCLASS)</h2>
+            <p style="color:var(--ink-soft); font-size:14px; margin-bottom:12px;">
+              <code>SolveResult</code> subclasses Python's built-in <code>str</code>. On success, <code>solve()</code> returns a <code>SolveResult</code>
+              that behaves as a normal string while exposing telemetry attributes; on timeout or error, <code>solve()</code> returns <code>None</code>.
+            </p>
+            <pre class="code-box"><button class="copy-button" onclick="copySnippet(this)">COPY</button><code>result = relay.solve(sitekey="...")
+
+if result:
+    # Direct string usage (zero casting needed)
+    headers = {"X-Captcha-Key": result}
+
+    # Access result telemetry
+    print("Success:", result.success)          # True
+    print("Token:", result.token)              # Same as str(result)
+    print("Elapsed:", result.elapsed_seconds)  # float seconds
+    print("Metadata:", result.metadata)        # {"mode": "direct", "port": 8787}</code></pre>
+          </div>
+
+          <!-- Functional & Network Helpers -->
+          <div id="api-functional" class="card-panel">
+            <h2>FUNCTIONAL &amp; NETWORK HELPERS</h2>
+            <p style="color:var(--ink-soft); font-size:14px; margin-bottom:12px;">
+              Top-level exports in <code>doescap</code> for single-call usage and LAN IP discovery:
+            </p>
+            <pre class="code-box"><button class="copy-button" onclick="copySnippet(this)">COPY</button><code>from doescap import solve_captcha, async_solve_captcha, get_local_ip, __version__
+
+print("DoesCap version:", __version__)
+
+# 1. Discover LAN IPv4 address (returns "127.0.0.1" if offline)
+ip = get_local_ip()
+
+# 2. One-shot sync helper (opens &amp; closes DoesCap automatically, returns Optional[str])
+token = solve_captcha(
+    sitekey="...",
+    rqdata=None,
+    port=8787,
+    host="0.0.0.0",
+    auto_open_browser=True,
+    browser_path=None,
+    timeout=300,
+    title="DoesCap Relay",
+    custom_html=None,
+    custom_html_path=None,
+    custom_assets_dir=None,
+)
+
+# 3. One-shot async helper (runs solve_captcha in asyncio executor)
+token = await async_solve_captcha(sitekey="...", port=8787)</code></pre>
+          </div>
+        </section>
+
+        <nav class="module-pager" aria-label="Module pagination">
+          <a class="pager-btn prev" href="endpoints.html">
+            <span class="pager-dir">&larr; PREVIOUS MODULE</span>
+            <span class="pager-title">REST Endpoints</span>
+          </a>
+          <a class="pager-btn next" href="theming.html">
+            <span class="pager-dir">NEXT MODULE &rarr;</span>
+            <span class="pager-title">Custom Webpages &amp; Themes</span>
+          </a>
+        </nav>
+      </div>
+    </main>
+  </div>
+
+  <script src="docs.js"></script>
+  <script>initDocs("api.html");</script>
+</body>
+</html>

@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <title>CLI &amp; Diagnostics &mdash; DoesCap Documentation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="DoesCap CLI flags, devtest.py live verification suite, and production operational notes.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="mobile-bar">
+    <div style="font-family: var(--font-head); font-size: 16px;">DOESCAP DOCS</div>
+    <button class="mobile-menu-btn" aria-label="Toggle navigation menu" onclick="toggleSidebar()">MENU ☰</button>
+  </div>
+
+  <div class="docs-container">
+    <aside id="sidebar" class="sidebar"></aside>
+
+    <main class="main-wrapper">
+      <div class="main-inner">
+        <span class="badge-pill">MODULE 6 / 6 &bull; CLI &amp; DIAGNOSTICS</span>
+        <h1 class="hero-title">CLI &amp; DIAGNOSTICS</h1>
+        <p class="hero-lead">
+          Run DoesCap straight from your terminal, verify tokens end-to-end against hCaptcha's official API with <code>devtest.py</code>, and review production operational notes.
+        </p>
+
+        <section id="cli-reference">
+          <div class="card-panel">
+            <h2>COMMAND LINE USAGE</h2>
+            <p style="color:var(--ink-soft); font-size:14px; margin-bottom:12px;">
+              Installed as the <code>doescap</code> CLI command:
+            </p>
+            <pre class="code-box"><button class="copy-button" onclick="copySnippet(this)">COPY</button><code># Basic execution
+doescap --sitekey "10000000-ffff-ffff-ffff-000000000001"
+
+# Full flags reference
+doescap --sitekey "..." \
+  --rqdata "OPTIONAL_RQDATA" \
+  --host "0.0.0.0" \
+  --port 8989 \
+  --timeout 180 \
+  --title "DoesCap CLI" \
+  --browser "chrome" \
+  --custom-html "./my_ui.html" \
+  --assets-dir "./assets" \
+  --no-browser</code></pre>
+          </div>
+        </section>
+
+        <section id="devtest">
+          <div class="card-panel">
+            <h2>LIVE BACKEND VERIFICATION (devtest.py)</h2>
+            <p style="color:var(--ink-soft); font-size:14px; margin-bottom:12px;">
+              The repository includes <code>devtest.py</code> for end-to-end testing against hCaptcha's official <code>https://api.hcaptcha.com/siteverify</code> endpoint using hCaptcha's public test keypair:
+            </p>
+            <pre class="code-box"><button class="copy-button" onclick="copySnippet(this)">COPY</button><code># Run interactive verification test (default test sitekey 10000000-ffff-ffff-ffff-000000000001)
+python devtest.py
+
+# Or test with your own sitekey, secret, and port
+python devtest.py --sitekey "YOUR_SITEKEY" --secret "YOUR_SECRET" --port 8787 --timeout 180</code></pre>
+            <p style="color:var(--ink-soft); font-size:13px; margin-top:12px;">
+              After you solve the challenge in the browser, <code>devtest.py</code> submits the token to <code>/siteverify</code>, prints the JSON validation response, and updates the browser panel via <code>mark_claimed()</code>.
+            </p>
+          </div>
+        </section>
+
+        <section id="notes">
+          <div class="card-panel">
+            <h2>PRODUCTION NOTES</h2>
+            <ul class="notes-ul">
+              <li>No authentication &mdash; treat relay endpoints as local-only bearer services.</li>
+              <li>Direct mode operates at native monitor/display refresh rates (60Hz &ndash; 144Hz) with 0ms synthetic input lag.</li>
+              <li>Network pairing: phones on the same Wi-Fi can open <code>relay.relay_url</code> to solve challenges for headless hosts. On Windows, <code>allow_firewall_rule=True</code> attempts to allow the active port through Windows Defender Firewall.</li>
+              <li>Deferred shutdown: calling <code>mark_claimed()</code> keeps the HTTP server alive for <code>25s</code> (and <code>mark_failed()</code> for <code>10s</code>) so the browser UI can display and copy any reward code before <code>close()</code> runs.</li>
+            </ul>
+          </div>
+        </section>
+
+        <nav class="module-pager" aria-label="Module pagination">
+          <a class="pager-btn prev" href="theming.html">
+            <span class="pager-dir">&larr; PREVIOUS MODULE</span>
+            <span class="pager-title">Custom Webpages &amp; Themes</span>
+          </a>
+        </nav>
+      </div>
+    </main>
+  </div>
+
+  <script src="docs.js"></script>
+  <script>initDocs("cli.html");</script>
+</body>
+</html>
