@@ -67,7 +67,7 @@ const DOCS_MODULES = [
 ];
 
 const SEARCH_INDEX = [
-  { module: "Getting Started", title: "Overview & Base URL", keywords: "doescap overview base url python windows macos linux termux", href: "index.html#overview" },
+  { module: "Getting Started", title: "Overview & Base URL", keywords: "doescap overview base url python windows macos linux termux ghosty", href: "index.html#overview" },
   { module: "Getting Started", title: "Quick Start (Sync & Async)", keywords: "quick start solve_captcha async_solve_captcha asyncio token", href: "index.html#quick-start" },
   { module: "Getting Started", title: "Installation & Extras", keywords: "pip install doescap websocket-client screencast", href: "index.html#installation" },
   { module: "Architecture", title: "Direct In-Browser Mode", keywords: "direct mode browser_path zero overhead 60hz 120hz", href: "architecture.html#direct-mode" },
@@ -98,6 +98,40 @@ const SEARCH_INDEX = [
   document.documentElement.setAttribute("data-theme", target);
 })();
 
+function setDrawerState(open) {
+  const sb = document.getElementById("sidebar");
+  const backdrop = document.getElementById("sidebar-backdrop");
+  if (sb) sb.classList.toggle("open", open);
+  if (backdrop) backdrop.classList.toggle("visible", open);
+  document.body.classList.toggle("drawer-open", open);
+}
+
+function toggleSidebar() {
+  const sb = document.getElementById("sidebar");
+  setDrawerState(!(sb && sb.classList.contains("open")));
+}
+
+function enhanceMobileHeader() {
+  const mobileBar = document.querySelector(".mobile-bar");
+  if (!mobileBar) return;
+  const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+  mobileBar.innerHTML = `
+    <a href="index.html" style="font-family: var(--font-head); font-size: 16px; color: var(--ink); text-decoration: none;">DOESCAP DOCS</a>
+    <div class="mobile-bar-actions">
+      <button id="mobile-theme-btn" class="mobile-theme-btn" aria-label="Toggle light or dark theme" onclick="toggleTheme()">${isDark ? "☀" : "☾"}</button>
+      <button class="mobile-menu-btn" aria-label="Toggle navigation menu" onclick="toggleSidebar()">MENU ☰</button>
+    </div>
+  `;
+
+  if (!document.getElementById("sidebar-backdrop")) {
+    const bd = document.createElement("div");
+    bd.id = "sidebar-backdrop";
+    bd.className = "sidebar-backdrop";
+    bd.addEventListener("click", () => setDrawerState(false));
+    document.body.appendChild(bd);
+  }
+}
+
 function renderSidebar(currentPage) {
   const sidebar = document.getElementById("sidebar");
   if (!sidebar) return;
@@ -124,10 +158,13 @@ function renderSidebar(currentPage) {
 
   sidebar.innerHTML = `
     <div class="brand-section">
-      <a class="brand-link" href="index.html">
-        DOESCAP
-        <span class="brand-pill">v1.0.0</span>
-      </a>
+      <div class="brand-top-row">
+        <a class="brand-link" href="index.html">
+          DOESCAP
+          <span class="brand-pill">v1.0.0</span>
+        </a>
+        <button class="drawer-close-btn" aria-label="Close navigation menu" onclick="setDrawerState(false)">✕</button>
+      </div>
       <div class="brand-subtitle">Universal Solver &amp; Relay Suite for Python</div>
     </div>
 
@@ -161,13 +198,8 @@ function renderSidebar(currentPage) {
     </div>
   `;
 
-  // Close mobile sidebar drawer after clicking any nav link
   sidebar.querySelectorAll(".nav-item a, .nav-title").forEach(link => {
-    link.addEventListener("click", () => {
-      if (sidebar.classList.contains("open")) {
-        sidebar.classList.remove("open");
-      }
-    });
+    link.addEventListener("click", () => setDrawerState(false));
   });
 }
 
@@ -179,15 +211,14 @@ function toggleTheme() {
 
   const label = document.getElementById("theme-label");
   const icon = document.getElementById("theme-icon");
+  const mobBtn = document.getElementById("mobile-theme-btn");
   if (label && icon) {
     label.textContent = target === "dark" ? "SWITCH TO LIGHT" : "SWITCH TO DARK";
     icon.textContent = target === "dark" ? "☀" : "☾";
   }
-}
-
-function toggleSidebar() {
-  const sb = document.getElementById("sidebar");
-  if (sb) sb.classList.toggle("open");
+  if (mobBtn) {
+    mobBtn.textContent = target === "dark" ? "☀" : "☾";
+  }
 }
 
 function copySnippet(btn) {
@@ -250,24 +281,17 @@ function handleSearch(query) {
   }
 
   resultsBox.innerHTML = matches.map(m => `
-    <a class="search-result-item" href="${m.href}" onclick="handleResultClick()">
+    <a class="search-result-item" href="${m.href}" onclick="setDrawerState(false)">
       <span class="search-result-module">${m.module}</span>
       <div class="search-result-title">${m.title}</div>
     </a>
   `).join("");
 }
 
-function handleResultClick() {
-  const sb = document.getElementById("sidebar");
-  if (sb && sb.classList.contains("open")) {
-    sb.classList.remove("open");
-  }
-}
-
 function initDocs(currentPage) {
+  enhanceMobileHeader();
   renderSidebar(currentPage);
 
-  // Ctrl+K / Cmd+K focuses search input
   window.addEventListener("keydown", e => {
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
       e.preventDefault();
@@ -277,9 +301,11 @@ function initDocs(currentPage) {
         inp.select();
       }
     }
+    if (e.key === "Escape") {
+      setDrawerState(false);
+    }
   });
 
-  // Scrollspy for headings/cards within the active module page
   window.addEventListener("scroll", () => {
     const targets = document.querySelectorAll("section[id], div[id^='endpoint-'], div[id^='api-']");
     let currentId = "";
