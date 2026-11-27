@@ -161,7 +161,7 @@ function renderSidebar(currentPage) {
       <div class="brand-top-row">
         <a class="brand-link" href="index.html">
           DOESCAP
-          <span class="brand-pill">v1.0.0</span>
+          <span class="brand-pill">v1.0.1</span>
         </a>
         <button class="drawer-close-btn" aria-label="Close navigation menu" onclick="setDrawerState(false)">✕</button>
       </div>
