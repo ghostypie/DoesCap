@@ -60,7 +60,7 @@ const DOCS_MODULES = [
     groupTitle: "CLI & DIAGNOSTICS",
     items: [
       { label: "CLI Tool Reference", href: "cli.html#cli-reference" },
-      { label: "Live Backend Verification", href: "cli.html#devtest" },
+      { label: "Automated Testing", href: "cli.html#testing" },
       { label: "Production Notes", href: "cli.html#notes" }
     ]
   }
@@ -86,7 +86,7 @@ const SEARCH_INDEX = [
   { module: "Custom Theming", title: "Custom HTML Templates & SSR Placeholders", keywords: "custom_html custom_html_path ssr placeholders title theme sitekey rqdata", href: "theming.html#custom-html" },
   { module: "Custom Theming", title: "Static Asset Hosting (/assets/*)", keywords: "custom_assets_dir static assets css logo commonpath", href: "theming.html#custom-assets" },
   { module: "CLI & Testing", title: "CLI Tool Reference", keywords: "doescap cli sitekey rqdata host port no-browser browser timeout title custom-html assets-dir", href: "cli.html#cli-reference" },
-  { module: "CLI & Testing", title: "Live Backend Verification (devtest.py)", keywords: "devtest siteverify api.hcaptcha.com test secret keypair", href: "cli.html#devtest" },
+  { module: "CLI & Testing", title: "Automated & Sandbox Testing (pytest)", keywords: "pytest tests test_doescap sitekey automated testing", href: "cli.html#testing" },
   { module: "CLI & Testing", title: "Production Notes & Firewall", keywords: "notes firewall netsh deferred cleanup 25s 10s", href: "cli.html#notes" }
 ];
 

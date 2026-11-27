@@ -9,6 +9,8 @@ Built for seamless operation across **Windows**, **macOS**, **Linux**, and **And
 ## Author & Community
 
 - **Author**: **GhoSty** &mdash; [https://github.com/ghostypie](https://github.com/ghostypie)
+- **Live Documentation**: [https://ghostypie.github.io/DoesCap/](https://ghostypie.github.io/DoesCap/)
+- **PyPI Package**: [https://pypi.org/project/doescap/](https://pypi.org/project/doescap/)
 - **Discord Support Server**: [https://discord.com/invite/asMJGgDA7u](https://discord.com/invite/asMJGgDA7u)
 - **Support / Donate (Donatree)**: [https://donatr.ee/brutality/](https://donatr.ee/brutality/)
 
@@ -16,7 +18,7 @@ Built for seamless operation across **Windows**, **macOS**, **Linux**, and **And
 
 ## Key Features
 
-- **Zero-Latency Direct Solver (Default)**: Renders the official challenge natively in the user's browser with 60Hz/120Hz touch responsiveness. Zero extra CPU or RAM consumption.
+- **Zero-Latency Direct Solver (Default)**: Renders the official challenge natively in the user's browser with 60Hz/120Hz touch responsiveness, forwarding Enterprise `rqdata` via `hcaptcha.render` and `hcaptcha.setData` with zero extra CPU or RAM consumption.
 - **Custom Webpage Designs**: Port your own custom HTML, CSS, logos, fonts, and layouts via `custom_html`, `custom_html_path`, and `custom_assets_dir` (including `{{ title }}`, `{{ theme }}`, `{{ sitekey }}`, and `{{ rqdata }}` SSR placeholders).
 - **Universal Android & Termux Support**: Automatically handles Termux URL opening tools (`termux-open-url`, `termux-open`) and native Android activity intents (`am start`).
 - **Modular 2D Documentation**: Multi-page 2D neo-brutalist documentation site with cross-page search, Next/Previous module navigation, and dark mode toggle in the `docs/` folder.
@@ -136,8 +138,9 @@ with DoesCap(config=config) as relay:
 
 #### Custom HTML Contract
 Your custom HTML can read SSR placeholders (`{{ title }}`, `{{ theme }}`, `{{ sitekey }}`, `{{ rqdata }}`) or communicate with two lightweight endpoints:
-1. `GET /status`: Returns JSON with active `sitekey`, `rqdata`, `mode`, `task_name`, `promo_code`, and state.
-2. `POST /solve`: Send `{ "token": token }` once hCaptcha's callback fires.
+1. `GET /status`: Returns JSON with active `sitekey`, `rqdata`, `mode`, `solved`, `claimed`, `task_name`, `promo_code`, and `success_message`.
+2. When `rqdata` is present, pass `opts.rqdata = info.rqdata` into `hcaptcha.render(...)` and call `hcaptcha.setData(widgetId, { rqdata: info.rqdata })`.
+3. `POST /solve`: Send `{ "token": token }` once hCaptcha's callback fires.
 
 Static files inside `custom_assets_dir` are served securely under `/assets/*`.
 

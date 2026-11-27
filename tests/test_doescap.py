@@ -202,9 +202,23 @@ def test_live_http_endpoints_and_solve_flow(tmp_path) -> None:
         assert res.success is True
         assert res.metadata["mode"] == "direct"
 
-        # Lifecycle methods update public status cleanly
+        # Lifecycle methods update public status cleanly even after solve() returns
         relay.mark_completed("All done!")
         assert relay.get_public_status()["success_message"] == "All done!"
+
+        relay.mark_claimed(task_name="Enterprise Quest", promo_code="GHOSTY-2026")
+        with urllib.request.urlopen(base + "/status") as resp:
+            post_claim = json.loads(resp.read().decode("utf-8"))
+            assert post_claim["solved"] is True
+            assert post_claim["claimed"] is True
+            assert post_claim["task_name"] == "Enterprise Quest"
+            assert post_claim["promo_code"] == "GHOSTY-2026"
+
+        # Verify built-in template handles post-solve claimed state updates
+        from doescap.templates import render_html_page
+        default_page = render_html_page(title="DoesCap", theme="dark")
+        assert "if (st.solved || st.claimed)" in default_page
+        assert "hcaptcha.setData" in default_page
 
 
 def test_custom_html_path_and_timeout(tmp_path) -> None:

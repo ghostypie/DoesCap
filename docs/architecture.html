@@ -36,6 +36,8 @@
             <ul class="notes-ul">
               <li><strong>Zero background RAM / CPU:</strong> No hidden headless Chromium process running in Python.</li>
               <li><strong>Hardware-Accelerated Touch:</strong> Renders <code>js.hcaptcha.com/1/api.js</code> directly in the user's browser at 60Hz&ndash;144Hz.</li>
+              <li><strong>Enterprise <code>rqdata</code> Support:</strong> Passes <code>rqdata</code> in both <code>hcaptcha.render(...)</code> options and <code>hcaptcha.setData(widgetId, { rqdata })</code> for challenges such as Discord flows.</li>
+              <li><strong>Live Post-Solve UI Updates:</strong> Calling <code>mark_claimed()</code> or <code>mark_completed()</code> updates the open success screen (task name, promo code, message) dynamically after <code>solve()</code> returns.</li>
               <li><strong>Instant Callback:</strong> Once solved, the browser fires <code>POST /solve</code> and <code>solve()</code> returns within milliseconds.</li>
             </ul>
           </div>
@@ -91,7 +93,7 @@ python -c 'from doescap import solve_captcha; print(solve_captcha("4c672d35-0701
     </main>
   </div>
 
-  <script src="docs.js?v=3"></script>
+  <script src="docs.js?v=4"></script>
   <script>initDocs("architecture.html");</script>
 </body>
 </html>
