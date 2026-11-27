@@ -70,7 +70,7 @@ CUSTOM_HTML_TEMPLATE = """<!doctype html>
         statusEl.textContent = 'Challenge Ready';
         
         window.__onReady = function() {
-          hcaptcha.render('widget-target', {
+          const opts = {
             sitekey: info.sitekey,
             theme: 'dark',
             callback: function(token) {
@@ -84,7 +84,14 @@ CUSTOM_HTML_TEMPLATE = """<!doctype html>
                 body: JSON.stringify({ token: token })
               });
             }
-          });
+          };
+          if (info.rqdata) {
+            opts.rqdata = info.rqdata;
+          }
+          const widgetId = hcaptcha.render('widget-target', opts);
+          if (info.rqdata && window.hcaptcha && window.hcaptcha.setData) {
+            try { window.hcaptcha.setData(widgetId, { rqdata: info.rqdata }); } catch (e) {}
+          }
         };
 
         const s = document.createElement('script');

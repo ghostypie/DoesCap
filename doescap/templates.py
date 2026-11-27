@@ -571,25 +571,28 @@ def render_html_page(title: str = "DoesCap Relay", theme: str = "dark") -> str:
             pullFrame();
           }}
 
-          if (st.solved) {{
+          if (st.solved || st.claimed) {{
             if (!isSolved) {{
               isSolved = true;
-              statusText.textContent = 'SUCCESS';
+              statusText.textContent = st.claimed ? 'CLAIMED' : 'VERIFIED';
               statusBadge.className = 'badge solved';
               mainPanel.style.display = 'none';
               successScreen.style.display = 'flex';
+            }}
 
-              if (st.task_name) {{
-                claimedTaskEl.textContent = st.task_name;
-                claimedTaskEl.style.display = 'block';
-              }}
-              if (st.promo_code) {{
-                promoValue.textContent = st.promo_code;
-                promoCard.style.display = 'block';
-              }}
-              if (st.success_message) {{
-                document.getElementById('success-subtext').textContent = st.success_message;
-              }}
+            if (st.claimed) {{
+              statusText.textContent = 'CLAIMED';
+            }}
+            if (st.task_name) {{
+              claimedTaskEl.textContent = st.task_name;
+              claimedTaskEl.style.display = 'block';
+            }}
+            if (st.promo_code) {{
+              promoValue.textContent = st.promo_code;
+              promoCard.style.display = 'block';
+            }}
+            if (st.success_message) {{
+              document.getElementById('success-subtext').textContent = st.success_message;
             }}
           }} else if (st.mode === 'direct' || st.rect) {{
             statusText.textContent = 'ACTIVE';
