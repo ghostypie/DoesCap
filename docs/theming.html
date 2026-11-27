@@ -48,9 +48,9 @@ with DoesCap(config=config) as relay:
 
             <div class="field-label">SSR TEMPLATE PLACEHOLDERS &amp; CLIENT CONTRACT</div>
             <ul class="notes-ul">
-              <li><strong>Optional SSR Placeholders:</strong> Server automatically replaces <code>{{ title }}</code>, <code>{{ theme }}</code>, <code>{{ sitekey }}</code>, and <code>{{ rqdata }}</code> inside custom HTML before serving.</li>
-              <li><strong>Client Polling:</strong> Fetch <code>GET /status</code> to retrieve live JSON <code>{"sitekey", "rqdata", "mode", "solved", "claimed", "task_name", "promo_code", "success_message"}</code>.</li>
-              <li><strong>Enterprise <code>rqdata</code> Binding:</strong> When <code>info.rqdata</code> is present, pass <code>opts.rqdata = info.rqdata</code> into <code>hcaptcha.render(...)</code> and call <code>hcaptcha.setData(widgetId, { rqdata: info.rqdata })</code>.</li>
+              <li><strong>Optional SSR Placeholders:</strong> Server automatically replaces <code>{{ title }}</code>, <code>{{ theme }}</code>, <code>{{ sitekey }}</code>, <code>{{ rqdata }}</code>, and <code>{{ captcha_host }}</code> inside custom HTML before serving.</li>
+              <li><strong>Client Polling:</strong> Fetch <code>GET /status</code> to retrieve live JSON <code>{"sitekey", "rqdata", "captcha_host", "mode", "solved", "claimed", "task_name", "promo_code", "success_message"}</code>.</li>
+              <li><strong>Enterprise <code>rqdata</code> &amp; <code>captcha_host</code> Binding:</strong> When <code>info.rqdata</code> or <code>info.captcha_host</code> is present, pass <code>&amp;host=</code> in the <code>api.js</code> query string, set <code>opts.rqdata</code> / <code>opts.host</code> in <code>hcaptcha.render(...)</code>, and call <code>hcaptcha.setData(widgetId, { rqdata, host })</code>.</li>
               <li><strong>Token Submission:</strong> When hCaptcha resolves, <code>POST /solve</code> with JSON <code>{"token": token}</code>.</li>
             </ul>
           </div>
@@ -84,7 +84,7 @@ with DoesCap(config=config) as relay:
     </main>
   </div>
 
-  <script src="docs.js?v=5"></script>
+  <script src="docs.js?v=6"></script>
   <script>initDocs("theming.html");</script>
 </body>
 </html>

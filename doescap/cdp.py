@@ -25,6 +25,7 @@ CDP_BOOT_SCRIPT = """
   window.__hcrToken = null;
   let host = document.getElementById('hcr-box');
   const rq = {rqdata};
+  const ch = {captcha_host};
   if (!host) {{
     host = document.createElement('div');
     host.id = 'hcr-box';
@@ -43,10 +44,16 @@ CDP_BOOT_SCRIPT = """
       "expired-callback": function() {{ window.__hcrToken = null; }}
     }};
     if (rq) opts.rqdata = rq;
+    if (ch) opts.host = ch;
     try {{
       window.__hcrId = hcaptcha.render('hcr-box', opts);
-      if (rq && window.hcaptcha && window.hcaptcha.setData) {{
-        try {{ window.hcaptcha.setData(window.__hcrId, {{ rqdata: rq }}); }} catch(e) {{}}
+      if (window.hcaptcha && window.hcaptcha.setData) {{
+        const sd = {{}};
+        if (rq) sd.rqdata = rq;
+        if (ch) sd.host = ch;
+        if (Object.keys(sd).length > 0) {{
+          try {{ window.hcaptcha.setData(window.__hcrId, sd); }} catch(e) {{}}
+        }}
       }}
     }} catch (e) {{
       console.error('render failed', e);
@@ -57,7 +64,11 @@ CDP_BOOT_SCRIPT = """
     window.__hcrReady();
   }} else {{
     const s = document.createElement('script');
-    s.src = 'https://js.hcaptcha.com/1/api.js?onload=__hcrReady&render=explicit';
+    let apiUrl = 'https://js.hcaptcha.com/1/api.js?onload=__hcrReady&render=explicit';
+    if (ch) {{
+      apiUrl += '&host=' + encodeURIComponent(ch);
+    }}
+    s.src = apiUrl;
     document.head.appendChild(s);
   }}
   return 'ok';

@@ -70,6 +70,11 @@ def main() -> int:
         default=None,
         help="Directory path containing custom static assets served at /assets/*.",
     )
+    parser.add_argument(
+        "--captcha-host",
+        default=None,
+        help="Optional hCaptcha origin hostname override (e.g., discord.com) for Enterprise challenges.",
+    )
 
     args = parser.parse_args()
 
@@ -82,6 +87,7 @@ def main() -> int:
         title=args.title,
         custom_html_path=args.custom_html,
         custom_assets_dir=args.assets_dir,
+        captcha_host=args.captcha_host,
     )
 
     relay = DoesCap(config=config)

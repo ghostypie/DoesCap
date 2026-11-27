@@ -51,6 +51,7 @@ class DoesCap:
         custom_html: Optional[str] = None,
         custom_html_path: Optional[str] = None,
         custom_assets_dir: Optional[str] = None,
+        captcha_host: Optional[str] = None,
     ):
         if config is not None:
             self.config = config
@@ -77,6 +78,8 @@ class DoesCap:
             self.config.custom_html_path = custom_html_path
         if custom_assets_dir is not None:
             self.config.custom_assets_dir = custom_assets_dir
+        if captcha_host is not None:
+            self.config.captcha_host = captcha_host
 
         self._lock = threading.Lock()
         self._server: Optional[ReusableThreadingServer] = None
@@ -89,6 +92,7 @@ class DoesCap:
             "mode": "direct",
             "sitekey": "",
             "rqdata": "",
+            "captcha_host": "",
             "task_name": "",
             "promo_code": "",
             "solved": False,
@@ -118,6 +122,7 @@ class DoesCap:
                 "mode": self._state["mode"],
                 "sitekey": self._state["sitekey"],
                 "rqdata": self._state["rqdata"],
+                "captcha_host": self._state["captcha_host"],
                 "task_name": self._state["task_name"],
                 "promo_code": self._state["promo_code"],
                 "solved": self._state["solved"],
@@ -319,6 +324,7 @@ class DoesCap:
         task_name: Optional[str] = None,
         custom_html: Optional[str] = None,
         custom_html_path: Optional[str] = None,
+        captcha_host: Optional[str] = None,
         **kwargs: Any,
     ) -> Optional[SolveResult]:
         """Solve an hCaptcha challenge synchronously.
@@ -329,6 +335,9 @@ class DoesCap:
         start_time = time.time()
         effective_timeout = timeout if timeout is not None else self.config.timeout
         effective_task = task_name or quest_name or ""
+        effective_captcha_host = (
+            captcha_host if captcha_host is not None else (self.config.captcha_host or "")
+        )
         auth_token = context_token or token
 
         if custom_html is not None:
@@ -351,6 +360,7 @@ class DoesCap:
                 "mode": "screencast" if use_screencast else "direct",
                 "sitekey": sitekey,
                 "rqdata": rqdata or "",
+                "captcha_host": effective_captcha_host,
                 "task_name": effective_task,
                 "promo_code": "",
                 "solved": False,
@@ -493,6 +503,7 @@ class DoesCap:
             self._cdp.evaluate(CDP_BOOT_SCRIPT.format(
                 sitekey=json.dumps(sitekey),
                 rqdata=json.dumps(rqdata),
+                captcha_host=json.dumps(effective_captcha_host),
             ))
 
             threading.Thread(target=self._mirror_screencast_loop, args=(self._cdp,), daemon=True).start()
@@ -541,6 +552,7 @@ class DoesCap:
         task_name: Optional[str] = None,
         custom_html: Optional[str] = None,
         custom_html_path: Optional[str] = None,
+        captcha_host: Optional[str] = None,
         **kwargs: Any,
     ) -> Optional[SolveResult]:
         """Solve an hCaptcha challenge asynchronously without blocking the event loop."""
@@ -558,6 +570,7 @@ class DoesCap:
                 task_name=task_name,
                 custom_html=custom_html,
                 custom_html_path=custom_html_path,
+                captcha_host=captcha_host,
                 **kwargs,
             ),
         )
@@ -615,6 +628,7 @@ def solve_captcha(
     custom_html: Optional[str] = None,
     custom_html_path: Optional[str] = None,
     custom_assets_dir: Optional[str] = None,
+    captcha_host: Optional[str] = None,
     **kwargs: Any,
 ) -> Optional[str]:
     """Convenience functional helper to solve hCaptcha in a single call."""
@@ -628,6 +642,7 @@ def solve_captcha(
         custom_html=custom_html,
         custom_html_path=custom_html_path,
         custom_assets_dir=custom_assets_dir,
+        captcha_host=captcha_host,
     )
     with DoesCap(config=config) as relay:
         result = relay.solve(sitekey=sitekey, rqdata=rqdata, **kwargs)
@@ -647,6 +662,7 @@ async def async_solve_captcha(
     custom_html: Optional[str] = None,
     custom_html_path: Optional[str] = None,
     custom_assets_dir: Optional[str] = None,
+    captcha_host: Optional[str] = None,
     **kwargs: Any,
 ) -> Optional[str]:
     """Convenience asynchronous helper to solve hCaptcha in a single call."""
@@ -665,6 +681,7 @@ async def async_solve_captcha(
             custom_html=custom_html,
             custom_html_path=custom_html_path,
             custom_assets_dir=custom_assets_dir,
+            captcha_host=captcha_host,
             **kwargs,
         ),
     )

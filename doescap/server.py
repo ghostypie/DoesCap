@@ -158,6 +158,7 @@ def build_request_handler(relay: "DoesCap") -> type[BaseHTTPRequestHandler]:
                             .replace("{{ theme }}", relay.config.theme)
                             .replace("{{ sitekey }}", status.get("sitekey", ""))
                             .replace("{{ rqdata }}", status.get("rqdata", ""))
+                            .replace("{{ captcha_host }}", status.get("captcha_host", ""))
                         )
                         self._send_response(200, rendered, "text/html; charset=utf-8")
                     else:

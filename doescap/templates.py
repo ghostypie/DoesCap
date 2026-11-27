@@ -494,7 +494,7 @@ def render_html_page(title: str = "DoesCap Relay", theme: str = "dark") -> str:
       sendInputEvent('release', p.x, p.y);
     }}, {{ passive: false }});
 
-    function initDirectSolver(sitekey, rqdata) {{
+    function initDirectSolver(sitekey, rqdata, captchaHost) {{
       if (directInitialized) return;
       directInitialized = true;
 
@@ -529,10 +529,16 @@ def render_html_page(title: str = "DoesCap Relay", theme: str = "dark") -> str:
             }}
           }};
           if (rqdata) options.rqdata = rqdata;
+          if (captchaHost) options.host = captchaHost;
 
           const widgetId = hcaptcha.render('direct-container', options);
-          if (rqdata && window.hcaptcha.setData) {{
-            try {{ window.hcaptcha.setData(widgetId, {{ rqdata: rqdata }}); }} catch(e) {{}}
+          if (window.hcaptcha.setData) {{
+            const setDataPayload = {{}};
+            if (rqdata) setDataPayload.rqdata = rqdata;
+            if (captchaHost) setDataPayload.host = captchaHost;
+            if (Object.keys(setDataPayload).length > 0) {{
+              try {{ window.hcaptcha.setData(widgetId, setDataPayload); }} catch(e) {{}}
+            }}
           }}
           statusText.textContent = 'READY TO SOLVE';
           statusBadge.className = 'badge active';
@@ -545,7 +551,11 @@ def render_html_page(title: str = "DoesCap Relay", theme: str = "dark") -> str:
         window.__onHCaptchaReady();
       }} else {{
         const script = document.createElement('script');
-        script.src = 'https://js.hcaptcha.com/1/api.js?onload=__onHCaptchaReady&render=explicit';
+        let apiUrl = 'https://js.hcaptcha.com/1/api.js?onload=__onHCaptchaReady&render=explicit';
+        if (captchaHost) {{
+          apiUrl += '&host=' + encodeURIComponent(captchaHost);
+        }}
+        script.src = apiUrl;
         script.async = true;
         script.defer = true;
         document.head.appendChild(script);
@@ -565,7 +575,7 @@ def render_html_page(title: str = "DoesCap Relay", theme: str = "dark") -> str:
           }}
 
           if (st.mode === 'direct' && st.sitekey) {{
-            initDirectSolver(st.sitekey, st.rqdata);
+            initDirectSolver(st.sitekey, st.rqdata, st.captcha_host);
           }} else if (st.mode === 'screencast' && !screencastInterval) {{
             screencastInterval = setInterval(pullFrame, 200);
             pullFrame();

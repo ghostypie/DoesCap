@@ -68,6 +68,9 @@ class RelayConfig:
         custom_html_path: Filepath pointing to a custom HTML file to serve.
         custom_assets_dir: Filepath pointing to a directory containing static assets
             (e.g., CSS, fonts, logos) served under `/assets/*`.
+        captcha_host: Optional origin hostname override (e.g., "discord.com")
+            passed to hCaptcha's loader URL (`&host=`), `hcaptcha.render`, and
+            `hcaptcha.setData` for Enterprise origin-locked challenges.
     """
 
     def __init__(
@@ -83,6 +86,7 @@ class RelayConfig:
         custom_html: Optional[str] = None,
         custom_html_path: Optional[str] = None,
         custom_assets_dir: Optional[str] = None,
+        captcha_host: Optional[str] = None,
     ):
         self.host = host
         self.port = port
@@ -95,10 +99,11 @@ class RelayConfig:
         self.custom_html = custom_html
         self.custom_html_path = custom_html_path
         self.custom_assets_dir = custom_assets_dir
+        self.captcha_host = captcha_host
 
     def __repr__(self) -> str:
         return (
             f"RelayConfig(host={self.host!r}, port={self.port}, "
             f"auto_open_browser={self.auto_open_browser}, timeout={self.timeout}, "
-            f"custom_html_path={self.custom_html_path!r})"
+            f"captcha_host={self.captcha_host!r}, custom_html_path={self.custom_html_path!r})"
         )

@@ -137,9 +137,9 @@ with DoesCap(config=config) as relay:
 ```
 
 #### Custom HTML Contract
-Your custom HTML can read SSR placeholders (`{{ title }}`, `{{ theme }}`, `{{ sitekey }}`, `{{ rqdata }}`) or communicate with two lightweight endpoints:
-1. `GET /status`: Returns JSON with active `sitekey`, `rqdata`, `mode`, `solved`, `claimed`, `task_name`, `promo_code`, and `success_message`.
-2. When `rqdata` is present, pass `opts.rqdata = info.rqdata` into `hcaptcha.render(...)` and call `hcaptcha.setData(widgetId, { rqdata: info.rqdata })`.
+Your custom HTML can read SSR placeholders (`{{ title }}`, `{{ theme }}`, `{{ sitekey }}`, `{{ rqdata }}`, `{{ captcha_host }}`) or communicate with two lightweight endpoints:
+1. `GET /status`: Returns JSON with active `sitekey`, `rqdata`, `captcha_host`, `mode`, `solved`, `claimed`, `task_name`, `promo_code`, and `success_message`.
+2. When `rqdata` or `captcha_host` is present, append `&host=` to the `api.js` URL, pass `opts.rqdata` / `opts.host` into `hcaptcha.render(...)`, and call `hcaptcha.setData(widgetId, { rqdata, host })`.
 3. `POST /solve`: Send `{ "token": token }` once hCaptcha's callback fires.
 
 Static files inside `custom_assets_dir` are served securely under `/assets/*`.
@@ -161,6 +161,7 @@ Static files inside `custom_assets_dir` are served securely under `/assets/*`.
 | `custom_html` | `str \| None` | `None` | Raw HTML string to serve as the custom UI. |
 | `custom_html_path` | `str \| None` | `None` | Filepath to a custom `.html` template to serve. |
 | `custom_assets_dir` | `str \| None` | `None` | Directory of assets (CSS, images, fonts) served at `/assets/*`. |
+| `captcha_host` | `str \| None` | `None` | Optional hCaptcha origin hostname override (e.g. `"discord.com"`) for origin-locked Enterprise captchas. |
 
 ---
 
@@ -183,7 +184,7 @@ Static files inside `custom_assets_dir` are served securely under `/assets/*`.
 ## CLI & Testing
 
 ```bash
-doescap --sitekey "YOUR_SITEKEY" --rqdata "OPTIONAL_RQDATA" --port 8787
+doescap --sitekey "YOUR_SITEKEY" --rqdata "OPTIONAL_RQDATA" --captcha-host "discord.com" --port 8787
 ```
 
 With custom HTML and assets:

@@ -68,12 +68,20 @@ def test_relay_config_defaults_and_overrides() -> None:
     assert cfg.custom_html is None
     assert cfg.custom_html_path is None
     assert cfg.custom_assets_dir is None
+    assert cfg.captcha_host is None
 
-    relay = DoesCap(host="127.0.0.1", port=9001, auto_open_browser=False, theme="light")
+    relay = DoesCap(
+        host="127.0.0.1",
+        port=9001,
+        auto_open_browser=False,
+        theme="light",
+        captcha_host="discord.com",
+    )
     assert relay.config.host == "127.0.0.1"
     assert relay.config.port == 9001
     assert relay.config.auto_open_browser is False
     assert relay.config.theme == "light"
+    assert relay.config.captcha_host == "discord.com"
 
 
 def test_network_helpers() -> None:
@@ -108,7 +116,8 @@ def test_live_http_endpoints_and_solve_flow(tmp_path) -> None:
 
     custom_html = (
         "<html><head><title>{{ title }}</title></head>"
-        "<body data-theme='{{ theme }}' data-sitekey='{{ sitekey }}' data-rq='{{ rqdata }}'>"
+        "<body data-theme='{{ theme }}' data-sitekey='{{ sitekey }}' "
+        "data-rq='{{ rqdata }}' data-host='{{ captcha_host }}'>"
         "<link rel='stylesheet' href='/assets/theme.css'>"
         "</body></html>"
     )
@@ -122,6 +131,7 @@ def test_live_http_endpoints_and_solve_flow(tmp_path) -> None:
         theme="light",
         custom_html=custom_html,
         custom_assets_dir=str(assets_dir),
+        captcha_host="discord.com",
     )
 
     with DoesCap(config=cfg) as relay:
@@ -149,6 +159,7 @@ def test_live_http_endpoints_and_solve_flow(tmp_path) -> None:
             assert "data-theme='light'" in html
             assert "data-sitekey='10000000-ffff-ffff-ffff-000000000001'" in html
             assert "data-rq='rq_payload_xyz'" in html
+            assert "data-host='discord.com'" in html
 
         # GET /status
         with urllib.request.urlopen(base + "/status") as resp:
@@ -156,6 +167,7 @@ def test_live_http_endpoints_and_solve_flow(tmp_path) -> None:
             assert status["mode"] == "direct"
             assert status["sitekey"] == "10000000-ffff-ffff-ffff-000000000001"
             assert status["rqdata"] == "rq_payload_xyz"
+            assert status["captcha_host"] == "discord.com"
             assert status["task_name"] == "UnitTestTask"
             assert status["solved"] is False
 
@@ -214,11 +226,26 @@ def test_live_http_endpoints_and_solve_flow(tmp_path) -> None:
             assert post_claim["task_name"] == "Enterprise Quest"
             assert post_claim["promo_code"] == "GHOSTY-2026"
 
-        # Verify built-in template handles post-solve claimed state updates
+        # Verify built-in template handles post-solve claimed state updates & origin binding
+        from doescap.cdp import CDP_BOOT_SCRIPT
         from doescap.templates import render_html_page
+
         default_page = render_html_page(title="DoesCap", theme="dark")
         assert "if (st.solved || st.claimed)" in default_page
         assert "hcaptcha.setData" in default_page
+        assert "options.host = captchaHost" in default_page
+        assert "setDataPayload.host = captchaHost" in default_page
+        assert "encodeURIComponent(captchaHost)" in default_page
+
+        cdp_js = CDP_BOOT_SCRIPT.format(
+            sitekey=json.dumps("10000000-ffff-ffff-ffff-000000000001"),
+            rqdata=json.dumps("rq_payload_xyz"),
+            captcha_host=json.dumps("discord.com"),
+        )
+        assert 'const ch = "discord.com";' in cdp_js
+        assert "opts.host = ch;" in cdp_js
+        assert "sd.host = ch;" in cdp_js
+        assert "encodeURIComponent(ch)" in cdp_js
 
 
 def test_custom_html_path_and_timeout(tmp_path) -> None:

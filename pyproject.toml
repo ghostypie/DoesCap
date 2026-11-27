@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "doescap"
-version = "1.0.1"
+version = "1.0.2"
 description = "DoesCap: Fast, lightweight cross-platform hCaptcha relay and solver library built by GhoSty, supporting Windows, macOS, Linux, and Android (Termux)."
 readme = "README.md"
 authors = [

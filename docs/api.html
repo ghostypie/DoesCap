@@ -63,7 +63,7 @@ with DoesCap(config=config) as relay:
 
             <div class="field-label">METHODS &amp; PROPERTIES</div>
             <ul class="notes-ul">
-              <li><code>solve(sitekey, rqdata=None, *, timeout=None, token=None, context_token=None, rqtoken=None, quest_name=None, task_name=None, custom_html=None, custom_html_path=None)</code> &rarr; <code>Optional[SolveResult]</code></li>
+              <li><code>solve(sitekey, rqdata=None, *, timeout=None, token=None, context_token=None, rqtoken=None, quest_name=None, task_name=None, captcha_host=None, custom_html=None, custom_html_path=None)</code> &rarr; <code>Optional[SolveResult]</code></li>
               <li><code>async_solve(...)</code> &rarr; <code>Optional[SolveResult]</code> (same parameters, runs inside <code>loop.run_in_executor</code>).</li>
               <li><code>solve_relay</code> &rarr; alias to <code>solve</code>.</li>
               <li><code>mark_completed(message="Verification complete!")</code> &rarr; updates <code>success_message</code> shown on the web success screen.</li>
@@ -158,6 +158,12 @@ with DoesCap(config=config) as relay:
                     <td><code>None</code></td>
                     <td>Directory for static files served safely under <code>/assets/*</code>.</td>
                   </tr>
+                  <tr>
+                    <td><code>captcha_host</code></td>
+                    <td>str | None</td>
+                    <td><code>None</code></td>
+                    <td>Optional hCaptcha origin hostname override (e.g. <code>"discord.com"</code>) for origin-locked Enterprise challenges.</td>
+                  </tr>
                 </tbody>
               </table>
             </div>
@@ -206,6 +212,7 @@ token = solve_captcha(
     browser_path=None,
     timeout=300,
     title="DoesCap Relay",
+    captcha_host=None,
     custom_html=None,
     custom_html_path=None,
     custom_assets_dir=None,
@@ -230,7 +237,7 @@ token = await async_solve_captcha(sitekey="...", port=8787)</code></pre>
     </main>
   </div>
 
-  <script src="docs.js?v=5"></script>
+  <script src="docs.js?v=6"></script>
   <script>initDocs("api.html");</script>
 </body>
 </html>

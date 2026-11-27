@@ -74,18 +74,18 @@ const SEARCH_INDEX = [
   { module: "Architecture", title: "Headless CDP Screencast Mode", keywords: "headless cdp screencast chromium find_browser chrome brave edge", href: "architecture.html#cdp-mode" },
   { module: "Architecture", title: "Android & Termux Setup", keywords: "android termux am start termux-open-url pkg install", href: "architecture.html#termux" },
   { module: "REST API", title: "GET / (Serve Relay Frontend)", keywords: "get root html frontend cors options", href: "endpoints.html#endpoint-root" },
-  { module: "REST API", title: "GET /status", keywords: "get status sitekey rqdata mode solved claimed task_name promo_code rect", href: "endpoints.html#endpoint-status" },
+  { module: "REST API", title: "GET /status", keywords: "get status sitekey rqdata captcha_host mode solved claimed task_name promo_code rect", href: "endpoints.html#endpoint-status" },
   { module: "REST API", title: "POST /solve", keywords: "post solve submit token h-captcha-response", href: "endpoints.html#endpoint-solve" },
   { module: "REST API", title: "GET /frame.jpg", keywords: "get frame jpg jpeg screencast mirror", href: "endpoints.html#endpoint-frame" },
   { module: "REST API", title: "POST /input", keywords: "post input mouse touch coordinates press move release", href: "endpoints.html#endpoint-input" },
   { module: "REST API", title: "GET /assets/*", keywords: "get assets static css js png svg ttf woff2 mime commonpath", href: "endpoints.html#endpoint-assets" },
   { module: "Python API", title: "DoesCap Class (HCaptchaRelay)", keywords: "doescap hcaptcharelay solve async_solve solve_relay mark_claimed mark_failed mark_completed close cleanup relay_url localhost_url", href: "api.html#api-relay" },
-  { module: "Python API", title: "RelayConfig Options", keywords: "relayconfig host port auto_open_browser browser_path timeout title theme allow_firewall_rule custom_html custom_html_path custom_assets_dir", href: "api.html#api-config" },
+  { module: "Python API", title: "RelayConfig Options", keywords: "relayconfig host port auto_open_browser browser_path timeout title theme allow_firewall_rule custom_html custom_html_path custom_assets_dir captcha_host", href: "api.html#api-config" },
   { module: "Python API", title: "SolveResult String Subclass", keywords: "solveresult str token success elapsed_seconds metadata", href: "api.html#api-result" },
   { module: "Python API", title: "Functional & Network Helpers", keywords: "solve_captcha async_solve_captcha get_local_ip __version__", href: "api.html#api-functional" },
-  { module: "Custom Theming", title: "Custom HTML Templates & SSR Placeholders", keywords: "custom_html custom_html_path ssr placeholders title theme sitekey rqdata", href: "theming.html#custom-html" },
+  { module: "Custom Theming", title: "Custom HTML Templates & SSR Placeholders", keywords: "custom_html custom_html_path ssr placeholders title theme sitekey rqdata captcha_host", href: "theming.html#custom-html" },
   { module: "Custom Theming", title: "Static Asset Hosting (/assets/*)", keywords: "custom_assets_dir static assets css logo commonpath", href: "theming.html#custom-assets" },
-  { module: "CLI & Testing", title: "CLI Tool Reference", keywords: "doescap cli sitekey rqdata host port no-browser browser timeout title custom-html assets-dir", href: "cli.html#cli-reference" },
+  { module: "CLI & Testing", title: "CLI Tool Reference", keywords: "doescap cli sitekey rqdata captcha-host host port no-browser browser timeout title custom-html assets-dir", href: "cli.html#cli-reference" },
   { module: "CLI & Testing", title: "Automated & Sandbox Testing (pytest)", keywords: "pytest tests test_doescap sitekey automated testing", href: "cli.html#testing" },
   { module: "CLI & Testing", title: "Production Notes & Firewall", keywords: "notes firewall netsh deferred cleanup 25s 10s", href: "cli.html#notes" }
 ];
@@ -161,7 +161,7 @@ function renderSidebar(currentPage) {
       <div class="brand-top-row">
         <a class="brand-link" href="index.html">
           DOESCAP
-          <span class="brand-pill">v1.0.1</span>
+          <span class="brand-pill">v1.0.2</span>
         </a>
         <button class="drawer-close-btn" aria-label="Close navigation menu" onclick="setDrawerState(false)">✕</button>
       </div>
